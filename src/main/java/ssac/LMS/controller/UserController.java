@@ -1,20 +1,19 @@
 package ssac.LMS.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
-import ssac.LMS.dto.JoinRequestDto;
-import ssac.LMS.dto.LoginRequestDto;
-import ssac.LMS.dto.LoginResponseDto;
+import ssac.LMS.dto.*;
 import ssac.LMS.service.AuthService;
+import ssac.LMS.service.CognitoJoinServiceImpl;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,13 +37,20 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
 
         LoginResponseDto loginResult = authService.login(loginRequestDto);
 
-//        log.info("loginResult={}", loginResult.);
+        log.info("loginResult={}", loginResult);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(loginResult);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDto> refresh(@RequestBody RefreshDto refreshDto) {
+        LoginResponseDto refresh = authService.refresh(refreshDto);
+        return ResponseEntity.status(HttpStatus.OK).body(refresh);
+    }
+
 }

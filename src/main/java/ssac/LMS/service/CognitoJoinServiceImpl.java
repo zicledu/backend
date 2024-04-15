@@ -1,5 +1,6 @@
 package ssac.LMS.service;
 
+import com.nimbusds.jwt.JWTParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,18 +10,16 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
-import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClientBuilder;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
-import ssac.LMS.domain.Enrollment;
 import ssac.LMS.domain.Role;
 import ssac.LMS.domain.User;
 import ssac.LMS.dto.JoinRequestDto;
 import ssac.LMS.dto.LoginRequestDto;
 import ssac.LMS.dto.LoginResponseDto;
+import ssac.LMS.dto.RefreshDto;
 import ssac.LMS.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class CognitoJoinServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
 
-    private CognitoIdentityProviderClient getCognitoClient() {
+    public CognitoIdentityProviderClient getCognitoClient() {
         CognitoIdentityProviderClient cognitoClient = CognitoIdentityProviderClient.builder()
                 .region(Region.of(AWS_REGION))
                 .credentialsProvider(DefaultCredentialsProvider.create())
@@ -119,7 +118,14 @@ public class CognitoJoinServiceImpl implements AuthService{
             String idToken = authenticationResultType.idToken();
             String refreshToken = authenticationResultType.refreshToken();
 
-            LoginResponseDto loginResponseDto = new LoginResponseDto(accessToken, idToken, refreshToken);
+            String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
+            String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
+            String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+
+
+            LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email,tokenDto);
+
             return loginResponseDto;
         }catch (Exception e) {
             log.info("error={}", e);
@@ -127,4 +133,38 @@ public class CognitoJoinServiceImpl implements AuthService{
         }
 
     }
+
+    @Override
+    public LoginResponseDto refresh(RefreshDto refreshDto) {
+        InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
+                .authFlow("REFRESH_TOKEN:")
+                .clientId(CLIENT_ID)
+                .authParameters(Map.of("REFRESH_TOKEN", refreshDto.getRefreshToken()))
+                .build();
+
+        try {
+            CognitoIdentityProviderClient cognitoClient = getCognitoClient();
+            InitiateAuthResponse authResponse = cognitoClient.initiateAuth(authRequest);
+
+            AuthenticationResultType authenticationResultType = authResponse.authenticationResult();
+
+            String accessToken = authenticationResultType.accessToken();
+            String idToken = authenticationResultType.idToken();
+            String refreshToken = authenticationResultType.refreshToken();
+
+            String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
+            String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
+            String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+
+
+            LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email,tokenDto);
+
+            return loginResponseDto;
+        }catch (Exception e) {
+            log.info("error={}", e);
+            return null;
+        }
+    }
+
 }

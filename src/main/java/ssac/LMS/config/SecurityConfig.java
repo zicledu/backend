@@ -16,6 +16,7 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.nimbusds.jwt.proc.JWTProcessor;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,17 +27,27 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GlobalSignOutRequest;
+import ssac.LMS.service.CognitoJoinServiceImpl;
 
+import java.io.IOException;
 import java.net.URL;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -57,6 +68,7 @@ public class SecurityConfig  {
     @Value("${simple.jwe-key-value}")
     RSAPrivateKey key;
 
+    private final CognitoJoinServiceImpl cognitoJoinService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -82,6 +94,37 @@ public class SecurityConfig  {
                 oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()
                         )));
+
+        http.logout(
+                auth -> auth.logoutUrl("/logout")
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                        .logoutSuccessHandler((request, response, authenticaton) -> {
+
+                            String authorization = request.getHeader("Authorization");
+                            System.out.println("authorization = " + authorization);
+                            if (authorization != null && authorization.contains("Bearer")) {
+                                String accessToken = authorization.replace("Bearer ", "").trim();
+                                CognitoIdentityProviderClient cognitoClient = cognitoJoinService.getCognitoClient();
+                                System.out.println("accessToken = " + accessToken);
+                                GlobalSignOutRequest globalSignOutRequest = GlobalSignOutRequest.builder()
+                                        .accessToken(accessToken)
+                                        .build();
+                                cognitoClient.globalSignOut(globalSignOutRequest);
+
+                            } else {
+                                // 인증되지 않은 사용자의 경우 처리
+                                // ...
+                                try {
+                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized 상태 코드 설정
+                                    response.getWriter().write("Not Login"); // 메시지 전송
+                                    response.getWriter().flush();
+                                } catch (IOException e) {
+                                    // 응답을 보낼 때 오류가 발생한 경우 처리
+                                    e.printStackTrace();
+                                }
+                            }
+                        }));
+
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -149,4 +192,5 @@ public class SecurityConfig  {
             return authorities;
         }
     }
+
 }

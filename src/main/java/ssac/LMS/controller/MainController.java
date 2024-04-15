@@ -15,8 +15,6 @@ public class MainController {
     @GetMapping("/main")
     public String adminP(@AuthenticationPrincipal Jwt jwt) {
 
-        Map<String, Object> claims = jwt.getClaims();
-        System.out.println("claims = " + claims);
         return "Main Controller";
     }
 }

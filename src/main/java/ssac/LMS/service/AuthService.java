@@ -1,13 +1,14 @@
 package ssac.LMS.service;
 
 import org.springframework.http.ResponseEntity;
-import ssac.LMS.dto.JoinRequestDto;
-import ssac.LMS.dto.LoginRequestDto;
-import ssac.LMS.dto.LoginResponseDto;
+import org.springframework.security.oauth2.jwt.Jwt;
+import ssac.LMS.dto.*;
 
 public interface AuthService {
 
     ResponseEntity<String> join(JoinRequestDto joinRequestDto);
 
     LoginResponseDto login(LoginRequestDto loginRequestDto);
+
+    LoginResponseDto refresh(RefreshDto refreshDto);
 }
