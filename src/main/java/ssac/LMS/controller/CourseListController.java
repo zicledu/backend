@@ -5,9 +5,13 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ssac.LMS.domain.Course;
+import ssac.LMS.domain.Enrollment;
 import ssac.LMS.dto.CourseResponseDto;
+import ssac.LMS.dto.MyCourseResponseDto;
 import ssac.LMS.service.CourseListService;
 
 import java.util.List;
@@ -47,13 +51,28 @@ public class CourseListController {
 
         log.info("best");
         List<Course> bestCourses = courseListService.getCourseByBest();
-
         List<CourseResponseDto> courseResponseDtoStream = bestCourses.stream()
                 .map(m -> new CourseResponseDto(m.getTitle(), m.getDescription(), m.getStartedAt(), m.getPrice(),
                         m.getTags(), m.getThumbnailPath()))
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(courseResponseDtoStream.size(), courseResponseDtoStream));
 
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getMyClass(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+        log.info("getUserId={}", userId);
+        log.info("jwtUserId={}", jwt.getClaim("cognito:username").toString());
+
+        if (!userId.equals(jwt.getClaim("cognito:username").toString())) {
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).body("Id가 맞지 않습니다.");
+        }
+
+        List<Enrollment> myClass = courseListService.getMyClass(userId);
+        List<MyCourseResponseDto> myCourseResponseDto = myClass.stream()
+                .map(m -> new MyCourseResponseDto(m.getCourse().getCourseId(), m.getCourse().getTitle(), m.getCourse().getUser().getUserName(), m.getEnrolledAt(), m.getCourse().getThumbnailPath()))
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(myCourseResponseDto.size(), myCourseResponseDto));
     }
 }
 

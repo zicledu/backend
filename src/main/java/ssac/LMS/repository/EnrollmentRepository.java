@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Enrollment;
+import ssac.LMS.domain.User;
 
 import java.util.List;
 import java.util.Map;
@@ -15,5 +16,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment,  Long> {
             "GROUP BY e.course " +
             "ORDER BY COUNT(e) DESC")
     List<Course> findTop5CoursesByEnrollmentCount();
+
+    List<Enrollment> findByUser(User user);
 
 }

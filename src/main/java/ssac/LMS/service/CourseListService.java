@@ -1,30 +1,30 @@
 package ssac.LMS.service;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ssac.LMS.domain.Course;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ssac.LMS.domain.Enrollment;
+import ssac.LMS.domain.User;
 import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.repository.EnrollmentRepository;
+import ssac.LMS.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class CourseListService {
-    @Autowired
-    private CourseRepository courseRepository;
 
-    @Autowired
-    private EnrollmentRepository enrollmentRepository;
-    @Autowired
-    private EntityManager entityManager;
-
+    private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final EntityManager entityManager;
+    private final UserRepository userRepository;
 
     public List<Course> getLatestCourses() {
         Sort sort = Sort.by(Sort.Direction.DESC, "startedAt");
@@ -58,6 +58,13 @@ public class CourseListService {
             System.out.println("\n");
         }
         return bestCourses;
+    }
+
+    public List<Enrollment> getMyClass(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        System.out.println("user = " + user);
+        List<Enrollment> EnrollmentByUser = enrollmentRepository.findByUser(user.get());
+        return EnrollmentByUser;
     }
 }
 

@@ -27,19 +27,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -99,13 +94,10 @@ public class SecurityConfig  {
                 auth -> auth.logoutUrl("/logout")
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                         .logoutSuccessHandler((request, response, authenticaton) -> {
-
                             String authorization = request.getHeader("Authorization");
-                            System.out.println("authorization = " + authorization);
                             if (authorization != null && authorization.contains("Bearer")) {
                                 String accessToken = authorization.replace("Bearer ", "").trim();
                                 CognitoIdentityProviderClient cognitoClient = cognitoJoinService.getCognitoClient();
-                                System.out.println("accessToken = " + accessToken);
                                 GlobalSignOutRequest globalSignOutRequest = GlobalSignOutRequest.builder()
                                         .accessToken(accessToken)
                                         .build();
