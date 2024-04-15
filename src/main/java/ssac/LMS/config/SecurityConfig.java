@@ -87,7 +87,7 @@ public class SecurityConfig  {
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/join", "/login","/course/new", "/course/best").permitAll()
+                .requestMatchers("/", "/join", "/login","/course/new", "/course/best", "/refresh").permitAll()
                 .requestMatchers("/main").hasAuthority("ROLE_STUDENT")
                 .anyRequest().authenticated());
         http.oauth2ResourceServer(oauth2 ->

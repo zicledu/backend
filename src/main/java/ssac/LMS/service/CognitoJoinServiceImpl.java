@@ -1,5 +1,7 @@
 package ssac.LMS.service;
 
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +22,11 @@ import ssac.LMS.dto.RefreshDto;
 import ssac.LMS.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -121,10 +126,23 @@ public class CognitoJoinServiceImpl implements AuthService{
             String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
             String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
             String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+            // JWTClaimsSet에서 만료 시간을 가져옴
 
+            TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+
+            // JWTClaimsSetParser를 사용하여 JWTClaimsSet를 파싱
+            JWTClaimsSet jwtClaimsSet = JWTParser.parse(idToken).getJWTClaimsSet();
+
+            // JWTClaimsSet에서 만료 시간을 가져옴
+            LocalDateTime expirationTime = jwtClaimsSet.getExpirationTime().toInstant()
+                    .atZone(ZoneId.of("UTC")).toLocalDateTime();
+
+            // 만료 시간을 한국 표준 시간대로 변환
+            LocalDateTime koreaTime = expirationTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(timeZone.toZoneId())
+                    .toLocalDateTime();
 
             LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email,tokenDto);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, koreaTime, tokenDto);
 
             return loginResponseDto;
         }catch (Exception e) {
@@ -137,7 +155,7 @@ public class CognitoJoinServiceImpl implements AuthService{
     @Override
     public LoginResponseDto refresh(RefreshDto refreshDto) {
         InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
-                .authFlow("REFRESH_TOKEN:")
+                .authFlow("REFRESH_TOKEN")
                 .clientId(CLIENT_ID)
                 .authParameters(Map.of("REFRESH_TOKEN", refreshDto.getRefreshToken()))
                 .build();
@@ -156,9 +174,21 @@ public class CognitoJoinServiceImpl implements AuthService{
             String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
             String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
 
+            TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+
+            // JWTClaimsSetParser를 사용하여 JWTClaimsSet를 파싱
+            JWTClaimsSet jwtClaimsSet = JWTParser.parse(idToken).getJWTClaimsSet();
+
+            // JWTClaimsSet에서 만료 시간을 가져옴
+            LocalDateTime expirationTime = jwtClaimsSet.getExpirationTime().toInstant()
+                    .atZone(ZoneId.of("UTC")).toLocalDateTime();
+
+            // 만료 시간을 한국 표준 시간대로 변환
+            LocalDateTime koreaTime = expirationTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(timeZone.toZoneId())
+                    .toLocalDateTime();
 
             LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email,tokenDto);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, koreaTime, tokenDto);
 
             return loginResponseDto;
         }catch (Exception e) {
