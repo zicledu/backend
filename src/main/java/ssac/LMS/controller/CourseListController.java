@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Enrollment;
 import ssac.LMS.dto.CourseResponseDto;
+import ssac.LMS.dto.CourseSearchResponseDto;
 import ssac.LMS.dto.MyCourseResponseDto;
 import ssac.LMS.service.CourseListService;
 
@@ -74,5 +75,25 @@ public class CourseListController {
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(myCourseResponseDto.size(), myCourseResponseDto));
     }
+
+//    @GetMapping("/search")
+//    public List<Course> getSearchCourse(@RequestParam("keyword") String keyword) {
+//        System.out.println("keyword = " + keyword);
+//        List<Course> searchCourse = courseListService.getSearchCourse(keyword);
+//        return searchCourse;
+//    }
+
+    @GetMapping("/search")
+    public List<CourseSearchResponseDto> getSearchCourse(@RequestParam("keyword") String keyword) {
+        List<Course> searchCourse = courseListService.getSearchCourse(keyword);
+
+        // 각 강의 정보를 CourseSearchResponseDto로 변환하여 리스트에 추가
+        List<CourseSearchResponseDto> responseDtoList = searchCourse.stream()
+                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getTags(), course.getUser().getUserName()))
+                .collect(Collectors.toList());
+
+        return responseDtoList;
+    }
+
 }
 

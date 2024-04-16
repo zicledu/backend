@@ -48,7 +48,6 @@ class CourseListServiceTest {
             System.out.println("\n");
         }
 
-
     }
 
     @Test
@@ -84,6 +83,19 @@ class CourseListServiceTest {
             System.out.println("courseTags = " + course.getTags());
             System.out.println("\n");
         }
+    }
+
+    @Test
+    void getByKeyword() {
+        String java = "Python";
+        List<Course> byKeyword = courseRepository.findByKeyword(java);
+        List<String> collect = byKeyword.stream().map(
+                m -> m.getTitle()).collect(Collectors.toList());
+
+        for (String s : collect) {
+            System.out.println("s = " + s);
+        }
+        System.out.println("byKeyword = " + byKeyword);
     }
 
 }
