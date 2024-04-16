@@ -1,0 +1,6 @@
+package ssac.LMS.domain;
+
+public enum Tags {
+
+    JAVA, PYTHON, SPRING, DJANGO, DEVOPS, FRONT, WEB, AI, REACT, JAVASCRIPT, ANGULAR, NODE_JS, RUBY_ON_RAILS, MACHINE_LEARNING, VUE_JS, Front_End, Back_End
+}
