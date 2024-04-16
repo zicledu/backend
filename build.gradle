@@ -17,6 +17,12 @@ configurations {
 	}
 }
 
+bootJar{
+	archivesBaseName = 'LMS'
+	archiveFileName = 'zicle.jar'
+	archiveVersion = "0.0.1"
+}
+
 repositories {
 	mavenCentral()
 }
