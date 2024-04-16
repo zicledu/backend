@@ -17,3 +17,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "   OR LOWER(u.userName) LIKE LOWER(concat('%', :keyword, '%'))")
     List<Course> findByKeyword(@Param("keyword") String keyword);
 
+
+}

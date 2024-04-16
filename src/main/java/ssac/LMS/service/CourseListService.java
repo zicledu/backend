@@ -82,7 +82,13 @@ public class CourseListService {
             System.out.println("userName = " + userName);
             System.out.println("\n");
         }
+
+
         return searchResult;
     }
 }
+
+
+
+
 

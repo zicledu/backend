@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Lecture;
+import ssac.LMS.domain.User;
+import ssac.LMS.dto.CourseDetailCurriculumResponseDto;
 import ssac.LMS.dto.CourseDetailSummaryResponseDto;
 import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.repository.LectureRepository;
@@ -38,6 +40,18 @@ public class CourseDetailService {
 
         CourseDetailSummaryResponseDto courseDetailSummaryResponseDto = new CourseDetailSummaryResponseDto(course.getCourseId(), course.getTitle(), course.getUser().getUserName(), size, totalRunTime, course.getThumbnailPath(), course.getPrice(), course.getTags());
         return courseDetailSummaryResponseDto;
+    }
+
+    public List<Lecture> getCourseCurriculum(Long courseId) {
+        Course course = courseRepository.findById(courseId).get();
+        List<Lecture> lectures = lectureRepository.findAllByCourse(course);
+        return lectures;
+    }
+
+    public User getInstructor(Long courseId) {
+        Course course = courseRepository.findById(courseId).get();
+        User user = course.getUser();
+        return user;
     }
 
     private static String convertMinutesToTime(long totalSeconds) {
