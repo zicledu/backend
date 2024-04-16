@@ -21,7 +21,7 @@ public class Lecture {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "courseId")
     @JsonIgnore
-    private Course course_id;
+    private Course course;
 
     @Column(nullable = false)
     private String title;
