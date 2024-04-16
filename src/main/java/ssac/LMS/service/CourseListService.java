@@ -63,6 +63,7 @@ public class CourseListService {
     public List<Enrollment> getMyClass(String userId) {
         Optional<User> user = userRepository.findById(userId);
         System.out.println("user = " + user);
+        System.out.println("user = " + user);
         List<Enrollment> EnrollmentByUser = enrollmentRepository.findByUser(user.get());
         return EnrollmentByUser;
     }
