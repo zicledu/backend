@@ -2,6 +2,7 @@ package ssac.LMS.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseListService {
 
     private final CourseRepository courseRepository;
@@ -65,6 +67,21 @@ public class CourseListService {
         System.out.println("user = " + user);
         List<Enrollment> EnrollmentByUser = enrollmentRepository.findByUser(user.get());
         return EnrollmentByUser;
+    }
+
+    public List<Course> getSearchCourse(String keyword) {
+        List<Course> searchResult = courseRepository.findByKeyword("%" + keyword + "%");
+
+        log.info("searchResult={}", searchResult);
+
+        for (Course course : searchResult) {
+            String userName = course.getUser().getUserName();
+            System.out.println("courseName = " + course.getTitle());
+            System.out.println("courseTags = " + course.getTags());
+            System.out.println("userName = " + userName);
+            System.out.println("\n");
+        }
+        return searchResult;
     }
 }
 
