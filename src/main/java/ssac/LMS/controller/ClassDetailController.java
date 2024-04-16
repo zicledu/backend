@@ -24,5 +24,6 @@ public class ClassDetailController {
     public ResponseEntity<CourseDetailSummaryResponseDto> getSummary(@PathVariable Long courseId) {
         CourseDetailSummaryResponseDto courseSummary = courseDetailService.getCourseSummary(courseId);
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(courseSummary);
+        
     }
 }
