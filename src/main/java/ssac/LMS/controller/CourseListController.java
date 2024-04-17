@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -76,15 +77,8 @@ public class CourseListController {
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(myCourseResponseDto.size(), myCourseResponseDto));
     }
 
-//    @GetMapping("/search")
-//    public List<Course> getSearchCourse(@RequestParam("keyword") String keyword) {
-//        System.out.println("keyword = " + keyword);
-//        List<Course> searchCourse = courseListService.getSearchCourse(keyword);
-//        return searchCourse;
-//    }
-
     @GetMapping("/search")
-    public List<CourseSearchResponseDto> getSearchCourse(@RequestParam("keyword") String keyword) {
+    public ResponseEntity<?> getSearchCourse(@RequestParam("keyword") String keyword) {
         List<Course> searchCourse = courseListService.getSearchCourse(keyword);
 
         // 각 강의 정보를 CourseSearchResponseDto로 변환하여 리스트에 추가
@@ -92,7 +86,7 @@ public class CourseListController {
                 .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getTags(), course.getUser().getUserName()))
                 .collect(Collectors.toList());
 
-        return responseDtoList;
+        return ResponseEntity.status(HttpStatus.OK).body(new Result(responseDtoList.size(), responseDtoList));
     }
 
 }
