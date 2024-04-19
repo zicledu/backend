@@ -1,6 +1,10 @@
 name: Mirror GitHub To CodeCommit
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+
 
 jobs:
   mirror_to_codecommit:
