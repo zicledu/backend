@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2  # Node.js 환경 설정 액션 사용
         with:
-          node-version: '14'  # 사용할 Node.js 버전 지정
+          node-version: '18'  # 사용할 Node.js 버전 지정
 
       - name: Install Docker
         run: sudo apt-get install -y docker.io  # Docker 설치 명령어 실행
