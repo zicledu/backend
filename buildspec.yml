@@ -1,33 +1,56 @@
-version: 0.2
+name: Build and Push Docker Image
 
-phases:
-  install:
-    runtime-versions:
-      nodejs: latest
-    commands:
-      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
-      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
-  pre_build:
-    commands:
-      - echo log in to Amazon ECR...
-      - aws --version
-      - echo $AWS_DEFAULT_REGION
-      - $(aws ecr get-login --no-include-email --region ap-northeast-2)
-      - REPOSITORY_URI=992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/user-service-api-registry
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:=latest}
-  build:
-    commands:
-      - echo Build started on `date`
-      - echo Building the Docker image.
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo write definitions file...
-      - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-artifacts:
-  files: imagedefinitions.json
+on:
+  push:
+    branches:
+      - main  # 이벤트를 트리거할 브랜치 지정
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # GitHub 리포지토리의 코드를 체크아웃하는 액션 사용
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2  # Node.js 환경 설정 액션 사용
+        with:
+          node-version: '14'  # 사용할 Node.js 버전 지정
+
+      - name: Install Docker
+        run: sudo apt-get install -y docker.io  # Docker 설치 명령어 실행
+
+      - name: Start Docker daemon
+        run: nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &  # Docker 데몬 실행
+
+      - name: Wait for Docker daemon
+        run: timeout 15 sh -c "until docker info; do echo .; sleep 1; done"  # Docker 데몬이 준비될 때까지 대기
+
+      - name: Log in to Amazon ECR
+        run: echo "Logging in to Amazon ECR..."
+
+      - name: Set AWS credentials
+        run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ secrets.AWS_DEFAULT_REGION }}  # AWS 자격 증명 설정
+
+      - name: Verify AWS CLI version
+        run: aws --version  # AWS CLI 버전 확인
+
+      - name: Get ECR login command
+        id: ecr-login
+        run: echo "::set-output name=login::$(aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com)"
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/aws-ecs-docker:latest .  # Docker 이미지 빌드
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/aws-ecs-docker:latest  # Docker 이미지 푸시
+
+      - name: Write image definitions file
+        run: printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/aws-ecs-docker:latest > imagedefinitions.json  # 이미지 정의 파일 작성
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2  # 아티팩트 업로드 액션 사용
+        with:
+          name: imagedefinitions
+          path: imagedefinitions.json  # 작성한 이미지 정의 파일 아티팩트로 업로드
