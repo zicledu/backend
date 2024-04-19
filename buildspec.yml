@@ -1,24 +1,33 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+    commands:
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+  pre_build:
+    commands:
+      - echo log in to Amazon ECR...
+      - aws --version
+      - echo $AWS_DEFAULT_REGION
+      - $(aws ecr get-login --no-include-email --region ap-northeast-2)
+      - REPOSITORY_URI=992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/user-service-api-registry
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
-      - echo Build Starting on `date`
-      - echo Build Starting on `date`
-      - chmod +x ./gradlew
-      - ./gradlew build
+      - echo Build started on `date`
+      - echo Building the Docker image.
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - echo $(basename ./build/libs/*.jar)
-      - pwd
-
+      - echo Build completed on `date`
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo write definitions file...
+      - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
-  files:
-    - appspec.yml
-    - build/libs/*.jar
-    - scripts/**
-  discard-paths: yes
-
-cache:
-  paths:
-    - '/root/.gradle/caches/**/*'
+  files: imagedefinitions.json
