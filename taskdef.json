@@ -1,0 +1,29 @@
+{
+    "executionRoleArn": "arn:aws:iam::(AWS_ACCOUNT_ID):role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "ecs-container",
+            "image": "(AWS_ACCOUNT_ID).dkr.ecr.ap-northeast-2.amazonaws.com/blue-web",
+            "memory": 256,
+            "essential": true,
+            "portMappings": [
+                {
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "containerPort": 80
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost/health || exit 1"
+                ]
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "networkMode": "bridge",
+    "family": "ecs-task-definition"
+}
