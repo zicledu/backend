@@ -3,7 +3,8 @@ version: 0.2
 phases:
   install:
     commands:
-      - sudo service docker start
+      # Docker 데몬 시작
+      - sudo dockerd &
       # Docker 데몬 실행 확인
       - docker info
   pre_build:
