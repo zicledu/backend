@@ -62,7 +62,7 @@ public class CourseListController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getMyClass(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<?> getMyClass(@PathVariable(name = "userId") String userId, @AuthenticationPrincipal Jwt jwt) {
         log.info("getUserId={}", userId);
         log.info("jwtUserId={}", jwt.getClaim("cognito:username").toString());
 

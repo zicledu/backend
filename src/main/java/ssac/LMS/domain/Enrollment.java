@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name="enrollments")
@@ -33,4 +34,6 @@ public class Enrollment {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Column(name="enrolled_at", nullable = false)
     private LocalDateTime enrolledAt;
+
+
 }
