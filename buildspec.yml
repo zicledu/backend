@@ -5,6 +5,7 @@ phases:
     commands:
       # Docker 서비스 시작
       # - sudo service docker start
+      - docker info
       - sudo docker ps
 
   pre_build:
