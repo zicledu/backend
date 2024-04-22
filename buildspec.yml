@@ -3,11 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
-      # Docker 서비스 시작
-      # - sudo service docker start
+      - sudo service docker start
+      # Docker 데몬 실행 확인
       - docker info
-      - sudo docker ps
-
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
