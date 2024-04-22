@@ -1,21 +1,65 @@
-version: 0.2
-phases:
-  build:
-    commands:
-      - echo Build Starting on `date`
-      - echo Build Starting on `date`
-      - chmod +x ./gradlew
-      - ./gradlew build
-  post_build:
-    commands:
-      - echo $(basename ./build/libs/*.jar)
-      - pwd
-artifacts:
-  files:
-    - appspec.yml
-    - build/libs/*.jar
-    - scripts/**
-  discard-paths: yes
-cache:
-  paths:
-    - '/root/.gradle/caches/**/*'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce
+
+      - name: Start Docker daemon
+        run: sudo systemctl start docker
+
+      - name: Wait for Docker daemon
+        run: docker --version && docker ps -a
+
+      - name: Log in to Amazon ECR
+        run: aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
+
+      - name: Set AWS credentials
+        run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set default.region ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Verify AWS CLI version
+        run: aws --version
+
+      - name: Get ECR login command
+        id: ecr-login
+        run: echo "::set-output name=login::$(aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com)"
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/aws-ecs-docker:latest .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/aws-ecs-docker:latest
+
+      - name: Write image definitions file
+        run: printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/aws-ecs-docker:latest > imagedefinitions.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: imagedefinitions
+          path: imagedefinitions.json
+
+      - name: ECR 로그인 및 Docker 이미지 실행
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
+          sudo docker run -d -p 8080:8080 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/edu:latest
