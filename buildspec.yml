@@ -14,30 +14,13 @@ phases:
 pre_build:
   commands:
     - echo "Logging in to Amazon ECR..."
-    - REGION=$(aws configure get region)
-    - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-    - echo "Region: $REGION"
-    - echo "Account: $AWS_ACCOUNT_ID"
-    # - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
     - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
-    
 
-
-
-
-  build:
-    commands:
-      - echo Building Docker image...
-      - docker build -t 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest .
-      - docker images | grep "yr-backend-zicledu"  
-
-      - echo Pushing Docker image to Amazon ECR...
-      #- docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/yr-backend-zicledu:latest
-      - docker tag yr-backend-zicledu:latest 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
-      - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
-      - echo "Region: $REGION"
-      - echo "Account: $AWS_ACCOUNT_ID"
-
-# artifacts:
-#   files:
-#     - imagedefinitions.json
+build:
+  commands:
+    - echo Building Docker image...
+    - docker build -t 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest .
+    - docker images | grep "yr-backend-zicledu"  
+    - echo Pushing Docker image to Amazon ECR...
+    - docker tag yr-backend-zicledu:latest 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
+    - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
