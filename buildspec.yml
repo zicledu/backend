@@ -8,8 +8,8 @@ phases:
       - echo Installing dependencies...
       # Additional installation commands if necessary
       - echo Installing Docker...
-      - sudo yum update -y
-      - sudo yum install -y docker-ce
+      # - sudo yum update -y
+      # - sudo yum install -y docker-ce
 
   pre_build:
     commands:
