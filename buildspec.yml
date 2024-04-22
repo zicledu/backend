@@ -31,6 +31,8 @@ pre_build:
       - echo Pushing Docker image to Amazon ECR...
       #- docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/yr-backend-zicledu:latest
       - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
+      - echo "Region: $REGION"
+      - echo "Account: $AWS_ACCOUNT_ID"
 
 # artifacts:
 #   files:
