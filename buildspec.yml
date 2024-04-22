@@ -14,8 +14,9 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - echo -e`리전: ${AWS_DEFAULT_REGION}`
-      - echo -e`계정: ${AWS_ACCOUNT_ID}`
+      - echo "리전: ${AWS_DEFAULT_REGION}"
+      - echo "계정: ${AWS_ACCOUNT_ID}"
+
       - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
 
 
