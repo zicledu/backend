@@ -4,7 +4,7 @@ phases:
   install:
     commands:
       # Docker 서비스 시작
-      - sudo service docker start
+      # - sudo service docker start
       - sudo docker ps
 
   pre_build:
