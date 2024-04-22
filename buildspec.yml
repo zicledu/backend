@@ -3,12 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
-      # Docker 설치
-      - echo Installing Docker...
-      - sudo yum update -y
-      - sudo yum install -y docker-ce
       # Docker 서비스 시작
       - sudo service docker start
+      - sudo docker ps
 
   pre_build:
     commands:
