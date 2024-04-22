@@ -9,7 +9,7 @@ phases:
       # Additional installation commands if necessary
       - echo Installing Docker...
       - sudo yum update -y
-      - sudo yum install -y docker.io
+      - sudo yum install -y docker-ce
 
   pre_build:
     commands:
