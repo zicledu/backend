@@ -1,22 +1,24 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-      # Docker 데몬 시작
-      - sudo dockerd &
-      # Docker 데몬 실행 확인
-      - docker info
   pre_build:
     commands:
+      # Amazon ECR에 로그인
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
 
+      # Docker 데몬 시작 (터미널에 출력)
+      - sudo dockerd
+
+      # Docker 데몬 실행 확인
+      - docker info
+
   build:
     commands:
+      # Docker 이미지 빌드 및 푸시
       - echo Building Docker image...
       - docker build -t 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest .
-      - docker images | grep "yr-backend-zicledu"  
+      - docker images | grep "yr-backend-zicledu"
       - echo Pushing Docker image to Amazon ECR...
       - docker tag yr-backend-zicledu:latest 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
       - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/yr-backend-zicledu:latest
