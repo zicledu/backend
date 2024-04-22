@@ -1,7 +1,12 @@
 package ssac.LMS.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.client.RestTemplate;
 import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Lecture;
 import ssac.LMS.domain.User;
@@ -15,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseDetailService {
 
     private final CourseRepository courseRepository;
@@ -48,6 +54,17 @@ public class CourseDetailService {
         return lectures;
     }
 
+
+    public String getInfo() {
+
+        String markdownUrl = "https://lmsh-test.s3.ap-northeast-2.amazonaws.com/sjhty123@naver.com/3bd51952-659a-4dbd-9457-2284a91568a7.md";
+        log.info("markdownUrl={}", markdownUrl);
+        // HTTP GET 요청을 보내서 마크다운 내용 가져오기
+        RestTemplate restTemplate = new RestTemplate();
+        String markdown = restTemplate.getForObject(markdownUrl, String.class);
+        log.info("markdown={}", markdown);
+        return markdown;
+    }
     public User getInstructor(Long courseId) {
         Course course = courseRepository.findById(courseId).get();
         User user = course.getUser();

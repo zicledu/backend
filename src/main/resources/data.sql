@@ -7,7 +7,7 @@ VALUES
     (false, '2024-04-09 14:30:00', '102','yhnmko12@gmail.com', 'ROLE_STUDENT', '010-1111-1111', '김정모'),
     (false, '2024-04-09 14:30:00', '74a89d3c-60a1-707d-5f42-d51b16e219b7','tkdgns5817@gmail.com', 'ROLE_STUDENT', '010-1111-1111', '박상훈'),
     (false, '2024-04-09 14:30:00', '104','1472MOMENT@gmail.com', 'ROLE_STUDENT', '010-1111-1111', '박예린'),
-    (false, '2024-04-09 14:30:00', '04f8edec-00d1-7011-33c0-423a3946fd88','6dreamhigh@naver.com', 'ROLE_STUDENT', '010-1111-1111', '황서정'),
+    (false, '2024-04-09 14:30:00', '105','6dreamhigh@naver.com', 'ROLE_STUDENT', '010-1111-1111', '황서정'),
     (false, '2024-04-09 14:30:00', '106', 'someone@gmail.com', 'ROLE_INSTRUCTOR', '010-1111-1111', '홍길동'),
     (false, '2024-04-09 14:30:00', '107', 'someone2@gmail.com', 'ROLE_INSTRUCTOR', '010-1111-1111', '홍이'),
     (false, '2024-04-09 14:30:00', '108', 'someone3@gmail.com', 'ROLE_INSTRUCTOR', '010-1111-1111', '홍삼'),
@@ -29,7 +29,7 @@ VALUES
     (2, '2024-04-08 14:10:00',2,'74a89d3c-60a1-707d-5f42-d51b16e219b7'),
     (3, '2024-04-10 14:20:00',3,'74a89d3c-60a1-707d-5f42-d51b16e219b7'),
     (4, '2024-04-07 14:30:00',4,'104'),
-    (4, '2024-04-09 14:00:00',5,'04f8edec-00d1-7011-33c0-423a3946fd88');
+    (4, '2024-04-09 14:00:00',5,'105');
 
 -- lecture 테이블에 테스트 데이터 삽입
 INSERT INTO lectures (lecture_id, course_id, title, content, duration_minutes, lecture_order, video_path_720, video_path_1080, video_path_original)

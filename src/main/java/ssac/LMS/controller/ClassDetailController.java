@@ -1,19 +1,18 @@
 package ssac.LMS.controller;
 
+import com.amazonaws.Response;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Lecture;
 import ssac.LMS.domain.User;
 import ssac.LMS.dto.CourseDetailCurriculumResponseDto;
 import ssac.LMS.dto.CourseDetailSummaryResponseDto;
+import ssac.LMS.dto.GetInfoResponseDto;
 import ssac.LMS.dto.InstructorResponseDto;
 import ssac.LMS.service.CourseDetailService;
 
@@ -49,6 +48,12 @@ public class ClassDetailController {
         User instructor = courseDetailService.getInstructor(courseId);
         InstructorResponseDto instructorResponseDto = new InstructorResponseDto(instructor.getUserId(), instructor.getEmail(), instructor.getUserName());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(instructorResponseDto);
+    }
+
+    @GetMapping("/info/{courseId}")
+    public ResponseEntity<?> getInfo(@PathVariable(name = "courseId") Long courseId) {
+        String markdown = courseDetailService.getInfo();
+        return ResponseEntity.status(HttpServletResponse.SC_OK).body(new GetInfoResponseDto(markdown));
     }
 
     @Data

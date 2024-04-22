@@ -25,8 +25,7 @@ public class Lecture {
 
     @Column(nullable = false)
     private String title;
-    @Column(nullable = false)
-    private String content;
+
     @Column(name="duration_minutes", nullable = false)
     private String  durationMinutes;
 
