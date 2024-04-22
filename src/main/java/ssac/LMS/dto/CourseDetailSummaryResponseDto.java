@@ -18,6 +18,6 @@ public class CourseDetailSummaryResponseDto {
     private int lectureCount;
     private String time;
     private String thumbnailPath;
-    private Long price;
+    private int price;
     private Tags tags;
 }

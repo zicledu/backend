@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.minidev.json.annotate.JsonIgnore;
+import java.time.LocalDateTime;
 
 import java.util.Date;
 import java.util.List;
@@ -33,19 +34,27 @@ public class Course {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Column(name="started_at", nullable = false)
-    private Date startedAt;
+    private LocalDateTime startedAt;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    @Column(name="end_at")
-    private Date endAt;
+    @Column(name="end_at", nullable = true)
+    private LocalDateTime endAt;
     @Column(nullable = false)
-    private Long price;
+    private int price;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Tags tags;
 
-    @Column(name="thumnail_path", nullable = false)
+    @Column(name="thumbnail_path", nullable = false)
     private String thumbnailPath;
+
+    @Column(name="thumbnail_path_1340", nullable = false)
+    private String thumbnailPath1340;
+
+    @Column(name="thumbnail_path_450", nullable = false)
+    private String thumbnailPath450;
+
+
 
     @OneToMany(mappedBy = "course", fetch=FetchType.LAZY)
     private List<Enrollment> enrollment;
