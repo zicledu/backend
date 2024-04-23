@@ -5,6 +5,8 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
+      - hostname 
+      - ip addr
       - echo "Node.js version $(node -v)"
       - npm init -y
       - npm install # 필요한 모듈 설치
