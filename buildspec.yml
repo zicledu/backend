@@ -2,9 +2,6 @@ version: 0.2
 
 phases:
   install:
-    commands:
-      - hostname 
-      - ip addr
       - yum install aws-cli
  
   pre_build:
