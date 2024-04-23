@@ -5,7 +5,7 @@ phases:
     commands:
       - hostname 
       - ip addr
-      - apt install aws-cli
+      - yum install aws-cli
  
   pre_build:
     commands:
