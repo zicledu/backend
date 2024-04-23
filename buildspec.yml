@@ -6,11 +6,23 @@ phases:
       nodejs: 18
     commands:
       - echo "Node.js version $(node -v)"
+      - npm init -y
       - npm install # 필요한 모듈 설치
 
+  pre_build:
+    commands:
+      # Amazon ECR에 로그인
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
+      
   build:
     commands:
-      - npm run build # 리액트 애플리케이션 빌드
-      - aws s3 cp dist/index.html s3://fronttest-min/index.html
-      # - aws s3 cp dist/* s3://fronttest-min/
-      - aws s3 cp --recursive dist/ s3://fronttest-min/
+      # Docker 이미지 빌드 및 푸시
+      - echo Building Docker image...
+      - docker build -t ecr:latest .
+      - docker images | grep "ecr
+      - echo Pushing Docker image to Amazon ECR...
+      - docker tag ecr:latest 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/ecr:latest
+      - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/ecr:latest
+
+
