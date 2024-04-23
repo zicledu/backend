@@ -53,6 +53,10 @@ public class CourseListService {
         log.info("searchResult={}", searchResult);
         return searchResult;
     }
+
+    public  List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
 }
 
 
