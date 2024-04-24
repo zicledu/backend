@@ -26,6 +26,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,6 +42,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GlobalSignOutRequest;
+import ssac.LMS.exception.CognitoAuthenticationEntryPoint;
 import ssac.LMS.service.CognitoJoinServiceImpl;
 
 import java.io.IOException;
@@ -52,7 +55,7 @@ import java.util.*;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig  {
+public class SecurityConfig {
 
     private final JWSAlgorithm jwsAlgorithm = JWSAlgorithm.RS256;
     private final JWEAlgorithm jweAlgorithm = JWEAlgorithm.RSA_OAEP_256;
@@ -83,10 +86,11 @@ public class SecurityConfig  {
         http.httpBasic(auth -> auth.disable());
         http.authorizeHttpRequests(auth -> auth
 
-                .requestMatchers("/", "/join", "/login","/course/new", "/course/best", "/refresh", "/course/**", "/class/**", "/upload/**").permitAll()
-                .requestMatchers("/upload/**").hasAuthority("ROLE_INSTRUCTOR")
-                .requestMatchers("/main").hasAuthority("ROLE_STUDENT")
-                .anyRequest().authenticated());
+                        .requestMatchers("/", "/join", "/login", "/course/new", "/course/best", "/refresh", "/course/**", "/class/**", "/upload/**").permitAll()
+                        .requestMatchers("/upload/**").hasAuthority("ROLE_INSTRUCTOR")
+                        .requestMatchers("/main").hasAuthority("ROLE_STUDENT")
+                        .anyRequest().authenticated())
+                .exceptionHandling((exceptionConfig) -> exceptionConfig.authenticationEntryPoint(new CognitoAuthenticationEntryPoint()));
         http.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()
