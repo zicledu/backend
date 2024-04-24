@@ -43,7 +43,7 @@ public class CourseListController {
 
         List<CourseResponseDto> courseResponseDtoStream = latestCourses.stream()
                 .map(m -> new CourseResponseDto(m.getTitle(), m.getDescription(), m.getStartedAt(), m.getPrice(),
-                        m.getTags(), m.getThumbnailPath()))
+                        m.getTags(), m.getThumbnailPath450(), m.getCourseId()))
                         .collect(Collectors.toList());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(courseResponseDtoStream.size(), courseResponseDtoStream));
     }
@@ -55,7 +55,7 @@ public class CourseListController {
         List<Course> bestCourses = courseListService.getCourseByBest();
         List<CourseResponseDto> courseResponseDtoStream = bestCourses.stream()
                 .map(m -> new CourseResponseDto(m.getTitle(), m.getDescription(), m.getStartedAt(), m.getPrice(),
-                        m.getTags(), m.getThumbnailPath()))
+                        m.getTags(), m.getThumbnailPath450(), m.getCourseId()))
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(courseResponseDtoStream.size(), courseResponseDtoStream));
 
@@ -72,7 +72,7 @@ public class CourseListController {
 
         List<Enrollment> myClass = courseListService.getMyClass(userId);
         List<MyCourseResponseDto> myCourseResponseDto = myClass.stream()
-                .map(m -> new MyCourseResponseDto(m.getCourse().getCourseId(), m.getCourse().getTitle(), m.getCourse().getUser().getUserName(), m.getEnrolledAt(), m.getCourse().getThumbnailPath()))
+                .map(m -> new MyCourseResponseDto(m.getCourse().getCourseId(), m.getCourse().getTitle(), m.getCourse().getUser().getUserName(), m.getEnrolledAt(), m.getCourse().getThumbnailPath450()))
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(myCourseResponseDto.size(), myCourseResponseDto));
     }
@@ -83,7 +83,7 @@ public class CourseListController {
 
         // 각 강의 정보를 CourseSearchInfo로 변환하여 리스트에 추가
         List<CourseSearchResponseDto> responseDtoList = searchCourse.stream()
-                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getDescription(), course.getCourseId(), course.getThumbnailPath(),  course.getTags(), course.getUser().getUserName()))
+                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getDescription(), course.getCourseId(), course.getThumbnailPath450(),  course.getTags(), course.getUser().getUserName()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(new Result(responseDtoList.size(), responseDtoList));
@@ -94,7 +94,7 @@ public class CourseListController {
         List<Course> allCourses = courseListService.getAllCourses();
 
         List<CourseSearchResponseDto> responseDtoList = allCourses.stream()
-                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getDescription(), course.getCourseId(), course.getThumbnailPath(),  course.getTags(), course.getUser().getUserName()))
+                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getDescription(), course.getCourseId(), course.getThumbnailPath450(),  course.getTags(), course.getUser().getUserName()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(new Result(responseDtoList.size(), responseDtoList));
