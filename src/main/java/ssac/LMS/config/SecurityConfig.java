@@ -110,8 +110,6 @@ public class SecurityConfig  {
                                 response.getWriter().write("Custom logout message"); // 응답의 본문을 작성하여 클라이언트에게 전달
                                 response.getWriter().flush(); // 작성한 응답을 클라이언트에게 전송
 
-
-
                             } else {
                                 // 인증되지 않은 사용자의 경우 처리
                                 // ...

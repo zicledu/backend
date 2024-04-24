@@ -4,21 +4,19 @@ phases:
   install:
     commands:
       - yum install aws-cli -y
- 
+
   pre_build:
     commands:
       # Amazon ECR에 로그인
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com
-      
+
   build:
     commands:
       # Docker 이미지 빌드 및 푸시
       - echo Building Docker image...
-      - docker build -t ecr:latest .
-      - docker images | grep "ecr
+      - docker build -t lms-back-image:latest .
+      - docker images | grep "lms-back-image"
       - echo Pushing Docker image to Amazon ECR...
-      - docker tag ecr:latest 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/ecr:latest
-      - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/ecr:latest
-
-
+      - docker tag lms-back-image:latest 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/lms-back-image:latest
+      - docker push 992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/lms-back-image:latest
