@@ -7,6 +7,7 @@ import ssac.LMS.domain.Course;
 import ssac.LMS.domain.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
@@ -19,4 +20,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByKeyword(@Param("keyword") String keyword);
 
     List<Course> findAllByUser(User user);
+
+    Optional<Course> findById(Long id);
 }

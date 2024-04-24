@@ -14,9 +14,11 @@ import ssac.LMS.domain.Enrollment;
 import ssac.LMS.dto.CourseResponseDto;
 import ssac.LMS.dto.CourseSearchResponseDto;
 import ssac.LMS.dto.MyCourseResponseDto;
+import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.service.CourseListService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CourseListController {
     private final CourseListService courseListService;
+    private final CourseRepository courseRepository;
 
     @Data
     static class Result<T> {
@@ -75,6 +78,12 @@ public class CourseListController {
                 .map(m -> new MyCourseResponseDto(m.getCourse().getCourseId(), m.getCourse().getTitle(), m.getCourse().getUser().getUserName(), m.getEnrolledAt(), m.getCourse().getThumbnailPath450()))
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(myCourseResponseDto.size(), myCourseResponseDto));
+    }
+
+    // 강좌 ID로 강좌 정보를 검색합니다.
+    public Course getCourseById(Long courseId) {
+        Optional<Course> courseOptional = courseRepository.findById(courseId);
+        return courseOptional.orElse(null); // 강좌를 찾지 못한 경우 null을 반환합니다.
     }
 
     @GetMapping("/search")

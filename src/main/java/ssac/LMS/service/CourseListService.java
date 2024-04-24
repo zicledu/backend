@@ -48,6 +48,9 @@ public class CourseListService {
         return EnrollmentByUser;
     }
 
+    // 강좌 ID로 강좌 정보를 검색합니다.
+
+
     public List<Course> getSearchCourse(String keyword) {
         List<Course> searchResult = courseRepository.findByKeyword("%" + keyword + "%");
         log.info("searchResult={}", searchResult);
@@ -56,6 +59,12 @@ public class CourseListService {
 
     public  List<Course> getAllCourses() {
         return courseRepository.findAll();
+    }
+
+    // 사용자의 수강 내역을 가져오는 메서드
+    public List<Enrollment> getEnrollments(String userId, Long courseId, Long enrollmentId) {
+        // 사용자 ID, 강좌 ID, 수강 ID를 기준으로 수강 내역을 조회합니다.
+        return enrollmentRepository.findEnrollments(userId, courseId, enrollmentId);
     }
 }
 

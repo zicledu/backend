@@ -23,4 +23,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment,  Long> {
 
     Optional<Enrollment> findByUserAndCourse(User user, Course course);
 
+    List<Enrollment> findByUserId(String userId);
+
+    @Query("SELECT e FROM Enrollment e WHERE e.user.userId = :userId AND e.course.courseId = :courseId AND e.enrollmentId = :enrollmentId")
+    List<Enrollment> findEnrollments(String userId, Long courseId, Long enrollmentId);
 }
