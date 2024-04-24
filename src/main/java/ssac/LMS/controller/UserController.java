@@ -16,6 +16,8 @@ import ssac.LMS.dto.*;
 import ssac.LMS.service.AuthService;
 import ssac.LMS.service.CognitoJoinServiceImpl;
 
+import java.text.ParseException;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -38,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) throws ParseException {
 
         LoginResponseDto loginResult = authService.login(loginRequestDto);
 
