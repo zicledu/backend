@@ -84,6 +84,7 @@ public class SecurityConfig  {
         http.authorizeHttpRequests(auth -> auth
 
                 .requestMatchers("/", "/join", "/login","/course/new", "/course/best", "/refresh", "/course/**", "/class/**", "/upload/**").permitAll()
+                .requestMatchers("/upload/**").hasAuthority("ROLE_INSTRUCTOR")
                 .requestMatchers("/main").hasAuthority("ROLE_STUDENT")
                 .anyRequest().authenticated());
         http.oauth2ResourceServer(oauth2 ->
@@ -103,6 +104,11 @@ public class SecurityConfig  {
                                         .accessToken(accessToken)
                                         .build();
                                 cognitoClient.globalSignOut(globalSignOutRequest);
+                                response.setStatus(HttpServletResponse.SC_OK); // 응답의 상태 코드를 설정 (예: 200 OK)
+                                response.setContentType("text/plain"); // 응답의 컨텐츠 타입 설정
+                                response.setCharacterEncoding("UTF-8"); // 응답의 문자 인코딩 설정
+                                response.getWriter().write("Custom logout message"); // 응답의 본문을 작성하여 클라이언트에게 전달
+                                response.getWriter().flush(); // 작성한 응답을 클라이언트에게 전송
 
                             } else {
                                 // 인증되지 않은 사용자의 경우 처리

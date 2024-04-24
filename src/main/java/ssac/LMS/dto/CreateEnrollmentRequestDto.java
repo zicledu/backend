@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstructorResponseDto {
-
+public class CreateEnrollmentRequestDto {
     private String userId;
-    private String userName;
-    private String email;
-    private int enrollmentCount;
-
+    private Long courseId;
 }

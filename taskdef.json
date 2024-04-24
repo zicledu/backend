@@ -1,0 +1,29 @@
+{
+    "executionRoleArn": "arn:aws:iam::992382811294:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "ecr",
+            "image": "992382811294.dkr.ecr.ap-northeast-2.amazonaws.com/ecr",
+            "memory": 256,
+            "essential": true,
+            "portMappings": [
+                {
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "containerPort": 80
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost/health || exit 1"
+                ]
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "networkMode": "bridge",
+    "family": "ecs-task-definition"
+}

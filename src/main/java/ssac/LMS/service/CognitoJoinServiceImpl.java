@@ -126,6 +126,8 @@ public class CognitoJoinServiceImpl implements AuthService{
             String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
             String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
             String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+            String role = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("custom:role").toString();
+
             // JWTClaimsSet에서 만료 시간을 가져옴
 
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
@@ -142,7 +144,7 @@ public class CognitoJoinServiceImpl implements AuthService{
                     .toLocalDateTime();
 
             LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, koreaTime, tokenDto);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, role, koreaTime, tokenDto);
 
             return loginResponseDto;
         }catch (Exception e) {
@@ -154,6 +156,7 @@ public class CognitoJoinServiceImpl implements AuthService{
 
     @Override
     public LoginResponseDto refresh(RefreshDto refreshDto) {
+        log.info("refreshDto={}", refreshDto);
         InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
                 .authFlow("REFRESH_TOKEN")
                 .clientId(CLIENT_ID)
@@ -173,6 +176,7 @@ public class CognitoJoinServiceImpl implements AuthService{
             String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
             String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
             String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+            String role = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("custom:role").toString();
 
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
 
@@ -188,7 +192,7 @@ public class CognitoJoinServiceImpl implements AuthService{
                     .toLocalDateTime();
 
             LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, koreaTime, tokenDto);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, role, koreaTime, tokenDto);
 
             return loginResponseDto;
         }catch (Exception e) {

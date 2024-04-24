@@ -9,6 +9,8 @@ import ssac.LMS.domain.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment,  Long> {
     @Query("SELECT e.course " +
@@ -18,5 +20,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment,  Long> {
     List<Course> findTop5CoursesByEnrollmentCount();
 
     List<Enrollment> findByUser(User user);
+
+    Optional<Enrollment> findByUserAndCourse(User user, Course course);
 
 }

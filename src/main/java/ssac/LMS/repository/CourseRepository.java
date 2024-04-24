@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ssac.LMS.domain.Course;
+import ssac.LMS.domain.User;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "   OR LOWER(u.userName) LIKE LOWER(concat('%', :keyword, '%'))")
     List<Course> findByKeyword(@Param("keyword") String keyword);
 
-
+    List<Course> findAllByUser(User user);
 }
