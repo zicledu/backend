@@ -8,12 +8,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ssac.LMS.dto.*;
 import ssac.LMS.service.AuthService;
 import ssac.LMS.service.CognitoJoinServiceImpl;
+
+import java.text.ParseException;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) throws ParseException {
 
         LoginResponseDto loginResult = authService.login(loginRequestDto);
 
@@ -52,5 +55,7 @@ public class UserController {
         LoginResponseDto refresh = authService.refresh(refreshDto);
         return ResponseEntity.status(HttpStatus.OK).body(refresh);
     }
+
+
 
 }

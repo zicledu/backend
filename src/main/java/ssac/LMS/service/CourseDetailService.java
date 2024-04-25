@@ -15,7 +15,11 @@ import ssac.LMS.dto.CourseDetailSummaryResponseDto;
 import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.repository.LectureRepository;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -43,8 +47,11 @@ public class CourseDetailService {
         String totalRunTime = convertMinutesToTime(totalDurationMinutes);
 
         int size = lecturesByCourse.size();
+        int price = course.getPrice();
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        String formattedPrice = formatter.format(price);
 
-        CourseDetailSummaryResponseDto courseDetailSummaryResponseDto = new CourseDetailSummaryResponseDto(course.getCourseId(), course.getTitle(), course.getUser().getUserName(), size, totalRunTime, course.getThumbnailPath(), course.getPrice(), course.getTags());
+        CourseDetailSummaryResponseDto courseDetailSummaryResponseDto = new CourseDetailSummaryResponseDto(course.getCourseId(), course.getTitle(), course.getUser().getUserName(), size, totalRunTime, course.getThumbnailPath1340(), formattedPrice, course.getTags());
         return courseDetailSummaryResponseDto;
     }
 
@@ -55,9 +62,10 @@ public class CourseDetailService {
     }
 
 
-    public String getInfo() {
+    public String getInfo(Long courseId) {
 
-        String markdownUrl = "https://lmsh-test.s3.ap-northeast-2.amazonaws.com/sjhty123@naver.com/3bd51952-659a-4dbd-9457-2284a91568a7.md";
+        Course course = courseRepository.findById(courseId).get();
+        String markdownUrl = course.getDescription();
         log.info("markdownUrl={}", markdownUrl);
         // HTTP GET 요청을 보내서 마크다운 내용 가져오기
         RestTemplate restTemplate = new RestTemplate();
@@ -65,10 +73,15 @@ public class CourseDetailService {
         log.info("markdown={}", markdown);
         return markdown;
     }
-    public User getInstructor(Long courseId) {
+    public HashMap<String, Object> getInstructor(Long courseId) {
         Course course = courseRepository.findById(courseId).get();
         User user = course.getUser();
-        return user;
+        List<Course> courses = courseRepository.findAllByUser(user);
+        int count = courses.size();
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("user", user);
+        result.put("count", count);
+        return result;
     }
 
     private static String convertMinutesToTime(long totalSeconds) {

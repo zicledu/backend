@@ -3,12 +3,14 @@ package ssac.LMS.service;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -21,6 +23,7 @@ import ssac.LMS.dto.LoginResponseDto;
 import ssac.LMS.dto.RefreshDto;
 import ssac.LMS.repository.UserRepository;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -105,7 +108,7 @@ public class CognitoJoinServiceImpl implements AuthService{
     }
 
     @Override
-    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) throws ParseException {
 
         InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
                 .authFlow("USER_PASSWORD_AUTH")
@@ -113,47 +116,43 @@ public class CognitoJoinServiceImpl implements AuthService{
                 .authParameters(Map.of("USERNAME", loginRequestDto.getEmail(), "PASSWORD", loginRequestDto.getPassword()))
                 .build();
 
-        try {
-            CognitoIdentityProviderClient cognitoClient = getCognitoClient();
-            InitiateAuthResponse authResponse = cognitoClient.initiateAuth(authRequest);
+        CognitoIdentityProviderClient cognitoClient = getCognitoClient();
+        InitiateAuthResponse authResponse = cognitoClient.initiateAuth(authRequest);
+        AuthenticationResultType authenticationResultType = authResponse.authenticationResult();
 
-            AuthenticationResultType authenticationResultType = authResponse.authenticationResult();
+        String accessToken = authenticationResultType.accessToken();
+        String idToken = authenticationResultType.idToken();
+        String refreshToken = authenticationResultType.refreshToken();
 
-            String accessToken = authenticationResultType.accessToken();
-            String idToken = authenticationResultType.idToken();
-            String refreshToken = authenticationResultType.refreshToken();
+        String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
+        String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
+        String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+        String role = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("custom:role").toString();
 
-            String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
-            String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
-            String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
-            // JWTClaimsSet에서 만료 시간을 가져옴
+        // JWTClaimsSet에서 만료 시간을 가져옴
 
-            TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
 
-            // JWTClaimsSetParser를 사용하여 JWTClaimsSet를 파싱
-            JWTClaimsSet jwtClaimsSet = JWTParser.parse(idToken).getJWTClaimsSet();
+        // JWTClaimsSetParser를 사용하여 JWTClaimsSet를 파싱
+        JWTClaimsSet jwtClaimsSet = JWTParser.parse(idToken).getJWTClaimsSet();
 
-            // JWTClaimsSet에서 만료 시간을 가져옴
-            LocalDateTime expirationTime = jwtClaimsSet.getExpirationTime().toInstant()
-                    .atZone(ZoneId.of("UTC")).toLocalDateTime();
+        // JWTClaimsSet에서 만료 시간을 가져옴
+        LocalDateTime expirationTime = jwtClaimsSet.getExpirationTime().toInstant()
+                .atZone(ZoneId.of("UTC")).toLocalDateTime();
 
-            // 만료 시간을 한국 표준 시간대로 변환
-            LocalDateTime koreaTime = expirationTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(timeZone.toZoneId())
-                    .toLocalDateTime();
+        // 만료 시간을 한국 표준 시간대로 변환
+        LocalDateTime koreaTime = expirationTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(timeZone.toZoneId())
+                .toLocalDateTime();
 
-            LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, koreaTime, tokenDto);
+        LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
+        LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, role, koreaTime, tokenDto);
 
-            return loginResponseDto;
-        }catch (Exception e) {
-            log.info("error={}", e);
-            return null;
-        }
-
+        return loginResponseDto;
     }
 
     @Override
     public LoginResponseDto refresh(RefreshDto refreshDto) {
+        log.info("refreshDto={}", refreshDto);
         InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
                 .authFlow("REFRESH_TOKEN")
                 .clientId(CLIENT_ID)
@@ -173,6 +172,7 @@ public class CognitoJoinServiceImpl implements AuthService{
             String email = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("email").toString();
             String name = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("name").toString();
             String id = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("cognito:username").toString();
+            String role = JWTParser.parse(idToken).getJWTClaimsSet().getClaim("custom:role").toString();
 
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
 
@@ -188,7 +188,7 @@ public class CognitoJoinServiceImpl implements AuthService{
                     .toLocalDateTime();
 
             LoginResponseDto.TokenDto tokenDto= new LoginResponseDto.TokenDto(accessToken, idToken, refreshToken);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, koreaTime, tokenDto);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(id, name, email, role, koreaTime, tokenDto);
 
             return loginResponseDto;
         }catch (Exception e) {

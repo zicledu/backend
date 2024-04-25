@@ -30,7 +30,7 @@ ENV GRADLE_HOME=/opt/gradle
 ENV PATH=$PATH:$GRADLE_HOME/bin
 
 # Gradle을 사용하여 프로젝트를 빌드합니다.
-RUN gradle clean build --no-daemon
+RUN gradle clean build
 
 # 빌드된 JAR 파일을 실행합니다.
 CMD ["java", "-jar", "build/libs/zicle.jar"]

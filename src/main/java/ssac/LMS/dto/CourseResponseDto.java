@@ -17,6 +17,7 @@ public class CourseResponseDto {
     private int price;
     private Tags tags;
     private String thumbnailPath;
+    private Long courseId;
 
 
 

@@ -113,8 +113,8 @@ public class UploadService {
         );
 
         String baseUrl = "https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/";
-        String thumbnailPath1340x958 = (baseUrl + email + "/thumbnail/" + "1340x958/" + "resized-" + uuid + "-1340x958" + ".png").replace(" ", "-");
-        String thumbnailPath450x250 = (baseUrl + email + "/thumbnail/" + "450x250/" + "resized-" + uuid + "-450x250" + ".png").replace(" ", "-");
+        String thumbnailPath1340x958 = (baseUrl + email + "/thumbnail/" + "1340x958/" + "resized-" + uuid + "-1340x958" + ".png").replace(" ", "-").replace("\\@", "\\%40");
+        String thumbnailPath450x250 = (baseUrl + email + "/thumbnail/" + "450x250/" + "resized-" + uuid + "-450x250" + ".png").replace(" ", "-").replace("\\@", "\\%40");
 
 
         HashMap<String, String> urlMap = new HashMap<>();
@@ -152,9 +152,9 @@ public class UploadService {
             lecture.setTitle(video.get("title").toString());
             lecture.setCourse(course);
 
-            String path720 = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s_720p.m3u8", email, uuid, uuid);
-            String path1080 = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s_1080p.m3u8", email, uuid, uuid);
-            String original = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s.m3u8", email, uuid, uuid);
+            String path720 = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s_720p.m3u8", email, uuid, uuid).replace("\\@", "\\%40");
+            String path1080 = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s_1080p.m3u8", email, uuid, uuid).replace("\\@", "\\%40");
+            String original = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s.m3u8", email, uuid, uuid).replace("\\@", "\\%40");
             lecture.setVideoPath720(path720);
             lecture.setVideoPath1080(path1080);
             lecture.setVideoPathOriginal(original);
