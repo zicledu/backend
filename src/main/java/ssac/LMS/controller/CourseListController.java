@@ -21,7 +21,6 @@ import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.service.CourseListService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -85,7 +84,7 @@ public class CourseListController {
 
     @GetMapping("/search")
     public ResponseEntity<?> getSearchCourse(@RequestParam("keyword") String keyword,
-                                             @PageableDefault(page = 0, size = 1) Pageable pageable) {
+                                             @PageableDefault(page = 0) Pageable pageable) {
         Page<Course> searchCourse = courseListService.getSearchCourse(keyword, pageable);
 
         int nowPage = searchCourse.getPageable().getPageNumber() + 1;
