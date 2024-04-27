@@ -62,9 +62,20 @@ public class CourseListService {
     }
 
     // 사용자의 수강 내역을 가져오는 메서드
-    public List<Enrollment> getEnrollments(String userId, Long courseId, Long enrollmentId) {
+    public boolean getEnrollment(String userId, Long courseId) {
         // 사용자 ID, 강좌 ID, 수강 ID를 기준으로 수강 내역을 조회합니다.
-        return enrollmentRepository.findEnrollments(userId, courseId, enrollmentId);
+        User user = userRepository.findById(userId).get();
+        Course course = courseRepository.findById(courseId).get();
+        boolean isExist = enrollmentRepository.existsByUserAndCourse(user, course);
+
+        return isExist;
+    }
+
+    public Course getEnrollmentCourse(Long courseId) {
+        // 사용자 ID, 강좌 ID, 수강 ID를 기준으로 수강 내역을 조회합니다.
+        Course course = courseRepository.findById(courseId).get();
+
+        return course;
     }
 }
 

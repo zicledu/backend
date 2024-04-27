@@ -148,7 +148,7 @@ public class UploadService {
             );
 
             Lecture lecture = new Lecture();
-            lecture.setLectureOorder(Integer.parseInt(video.get("order").toString()));
+            lecture.setLectureOrder(Integer.parseInt(video.get("order").toString()));
             lecture.setTitle(video.get("title").toString());
             lecture.setCourse(course);
 

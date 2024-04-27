@@ -38,7 +38,7 @@ public class ClassDetailController {
     public ResponseEntity<Result> getCurriculum(@PathVariable(name = "courseId") Long courseId) {
         List<Lecture> lectures = courseDetailService.getCourseCurriculum(courseId);
         List<CourseDetailCurriculumResponseDto> curriculum = lectures.stream().map(m ->
-                new CourseDetailCurriculumResponseDto(m.getLectureId(), m.getTitle(), m.getDurationMinutes(), m.getLectureOorder())).collect(Collectors.toList());
+                new CourseDetailCurriculumResponseDto(m.getLectureId(), m.getTitle(), m.getDurationMinutes(), m.getLectureOrder())).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(curriculum.size(), curriculum));
     }

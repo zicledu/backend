@@ -30,7 +30,7 @@ public class Lecture {
     private String  durationMinutes;
 
     @Column(name="lecture_order", unique=false, nullable = false)
-    private Integer lectureOorder;
+    private Integer lectureOrder;
 
     @Column(name="video_path_720", nullable = false)
     private String videoPath720;

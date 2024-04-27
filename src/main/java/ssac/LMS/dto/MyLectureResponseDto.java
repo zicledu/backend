@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MyEnrollmentResponseDto {
-
-    private String userId;
+public class MyLectureResponseDto {
     private Long courseId;
-    private Long enrollment_Id;
     private String title;
+    private Integer lectureOrder;
     private String durationMinutes;
     private String videoPath720;
     private String videoPath1080;
@@ -20,4 +18,3 @@ public class MyEnrollmentResponseDto {
     private String thumbnailPath;
 
 }
-

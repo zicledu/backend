@@ -80,12 +80,6 @@ public class CourseListController {
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(myCourseResponseDto.size(), myCourseResponseDto));
     }
 
-    // 강좌 ID로 강좌 정보를 검색합니다.
-    public Course getCourseById(Long courseId) {
-        Optional<Course> courseOptional = courseRepository.findById(courseId);
-        return courseOptional.orElse(null); // 강좌를 찾지 못한 경우 null을 반환합니다.
-    }
-
     @GetMapping("/search")
     public ResponseEntity<?> getSearchCourse(@RequestParam("keyword") String keyword) {
         List<Course> searchCourse = courseListService.getSearchCourse(keyword);
