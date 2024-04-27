@@ -16,4 +16,5 @@ public class MyCourseResponseDto {
     private String instructor;
     private LocalDateTime enrolledAt;
     private String thumbnailPath;
+
 }

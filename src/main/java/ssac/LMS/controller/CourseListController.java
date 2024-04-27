@@ -17,9 +17,11 @@ import ssac.LMS.domain.Enrollment;
 import ssac.LMS.dto.CourseResponseDto;
 import ssac.LMS.dto.CourseSearchResponseDto;
 import ssac.LMS.dto.MyCourseResponseDto;
+import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.service.CourseListService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CourseListController {
     private final CourseListService courseListService;
+    private final CourseRepository courseRepository;
 
     @Data
     static class Result<T> {
@@ -65,7 +68,7 @@ public class CourseListController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getMyClass(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<?> getMyClass(@PathVariable(name = "userId") String userId, @AuthenticationPrincipal Jwt jwt) {
         log.info("getUserId={}", userId);
         log.info("jwtUserId={}", jwt.getClaim("cognito:username").toString());
 

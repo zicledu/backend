@@ -1,13 +1,12 @@
 package ssac.LMS.controller;
 
-import com.amazonaws.Response;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Lecture;
 import ssac.LMS.domain.User;
 import ssac.LMS.dto.*;
@@ -38,7 +37,7 @@ public class ClassDetailController {
     public ResponseEntity<Result> getCurriculum(@PathVariable(name = "courseId") Long courseId) {
         List<Lecture> lectures = courseDetailService.getCourseCurriculum(courseId);
         List<CourseDetailCurriculumResponseDto> curriculum = lectures.stream().map(m ->
-                new CourseDetailCurriculumResponseDto(m.getLectureId(), m.getTitle(), m.getDurationMinutes(), m.getLectureOorder())).collect(Collectors.toList());
+                new CourseDetailCurriculumResponseDto(m.getLectureId(), m.getTitle(), m.getDurationMinutes(), m.getLectureOrder())).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpServletResponse.SC_OK).body(new Result(curriculum.size(), curriculum));
     }
