@@ -30,9 +30,9 @@ public class CourseDetailService {
     private final CourseRepository courseRepository;
     private final LectureRepository lectureRepository;
     public CourseDetailSummaryResponseDto getCourseSummary(Long courseId) {
+        log.info("getCourseSummary.courseId={}", courseId);
 
         Course course = courseRepository.findById(courseId).get();
-
         List<Lecture> lecturesByCourse = lectureRepository.findAllByCourse(course);
 
         Long totalDurationMinutes = lecturesByCourse.stream()
@@ -56,6 +56,7 @@ public class CourseDetailService {
     }
 
     public List<Lecture> getCourseCurriculum(Long courseId) {
+        log.info("getCourseCurriculum.courseId={}", courseId);
         Course course = courseRepository.findById(courseId).get();
         List<Lecture> lectures = lectureRepository.findAllByCourse(course);
         return lectures;
@@ -63,14 +64,12 @@ public class CourseDetailService {
 
 
     public String getInfo(Long courseId) {
-
+        log.info("getInfo.courseId={}", courseId);
         Course course = courseRepository.findById(courseId).get();
         String markdownUrl = course.getDescription();
-        log.info("markdownUrl={}", markdownUrl);
         // HTTP GET 요청을 보내서 마크다운 내용 가져오기
         RestTemplate restTemplate = new RestTemplate();
         String markdown = restTemplate.getForObject(markdownUrl, String.class);
-        log.info("markdown={}", markdown);
         return markdown;
     }
     public HashMap<String, Object> getInstructor(Long courseId) {

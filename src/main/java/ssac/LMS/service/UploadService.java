@@ -9,6 +9,10 @@ import com.amazonaws.services.s3.model.PublicAccessBlockConfiguration;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
+import org.jcodec.common.io.NIOUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,9 +27,15 @@ import ssac.LMS.repository.CourseRepository;
 import ssac.LMS.repository.LectureRepository;
 import ssac.LMS.repository.UserRepository;
 
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,9 +74,7 @@ public class UploadService {
         AmazonS3 credentials = getCredentials();
 
         UUID uuid = UUID.randomUUID();
-        String originalFilename = file.getOriginalFilename();
-        int lastIndex = originalFilename.lastIndexOf(".");
-        String subString = originalFilename.substring(lastIndex);
+        String subString = getSubString(file);
 
         String name = email + '/' + uuid + subString;
 
@@ -82,7 +90,7 @@ public class UploadService {
         AmazonS3 credentials = getCredentials();
 
         UUID uuid = UUID.randomUUID();
-        String fileName = email + '/' + uuid + ".md";
+        String fileName = "markdown/" + email + '/' + uuid + ".md";
 
         log.info("uploadMarkdown={}", fileName);
 
@@ -91,18 +99,19 @@ public class UploadService {
 
 
         credentials.putObject(
-                new PutObjectRequest("lmsh-test", fileName, new ByteArrayInputStream(markdown.getBytes()), objectMetadata)
+                new PutObjectRequest("fronttest-min", fileName, new ByteArrayInputStream(markdown.getBytes()), objectMetadata)
         );
-        return credentials.getUrl("lmsh-test", fileName).toString();
+
+        String getUrl = credentials.getUrl("fronttest-min", fileName).toString().replace("%40", "@");
+        log.info("getUrl={}", getUrl);
+        return getUrl;
     }
 
     public Map<String,String> uploadThumbnail(MultipartFile thumbnail, String email) throws IOException {
         AmazonS3 credentials = getCredentials();
         UUID uuid = UUID.randomUUID();
 
-        String originalFilename = thumbnail.getOriginalFilename();
-        int lastIndex = originalFilename.lastIndexOf(".");
-        String subString = originalFilename.substring(lastIndex);
+        String subString = getSubString(thumbnail);
         String fileName = (email + "/" + uuid + subString).replace(" ", "-");
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -124,7 +133,7 @@ public class UploadService {
         return urlMap;
     }
 
-    public void uploadVideo(List<Map<String, Object>> videos, String email, Long courseId) throws IOException {
+    public void uploadVideo(List<Map<String, Object>> videos, String email, Long courseId) throws IOException, JCodecException {
 
         AmazonS3 credentials = getCredentials();
         Course course = courseRepository.findById(courseId).get();
@@ -134,9 +143,11 @@ public class UploadService {
             UUID uuid = UUID.randomUUID();
 
             MultipartFile file =(MultipartFile) video.get("file");
-            String originalFilename = file.getOriginalFilename();
-            int lastIndex = originalFilename.lastIndexOf(".");
-            String subString = originalFilename.substring(lastIndex);
+
+            String duration = getDuration(file);
+            log.info("duration={}", duration);
+
+            String subString = getSubString(file);
 
             String fileName = (email + "/" + uuid + subString).replace(" ", "-");
 
@@ -151,6 +162,7 @@ public class UploadService {
             lecture.setLectureOorder(Integer.parseInt(video.get("order").toString()));
             lecture.setTitle(video.get("title").toString());
             lecture.setCourse(course);
+            lecture.setDurationMinutes(duration);
 
             String path720 = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s_720p.m3u8", email, uuid, uuid).replace("\\@", "\\%40");
             String path1080 = String.format("https://lms-outputvod.s3.ap-northeast-2.amazonaws.com/%s/%s/%s_1080p.m3u8", email, uuid, uuid).replace("\\@", "\\%40");
@@ -159,18 +171,33 @@ public class UploadService {
             lecture.setVideoPath1080(path1080);
             lecture.setVideoPathOriginal(original);
 
-            ObjectMetadata objectMetadata1 = credentials.getObjectMetadata("lms-inputvod-968574", fileName);
-            log.info("objectMetadata1.getContentLengtg={}", objectMetadata1.getContentLength());
-            lecture.setDurationMinutes(Long.toString(objectMetadata1.getContentLength()));
             lectureRepository.save(lecture);
 
         }
+    }
+
+    private static String getSubString(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        int lastIndex = originalFilename.lastIndexOf(".");
+        String subString = originalFilename.substring(lastIndex);
+        return subString;
+    }
+
+    private static String getDuration(MultipartFile file) throws IOException, JCodecException {
+        File file1 = new File(file.getOriginalFilename());
+        FileUtils.writeByteArrayToFile(file1, file.getBytes());
+        FrameGrab frameGrab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(file1));
+        double totalDuration = frameGrab.getVideoTrack().getMeta().getTotalDuration();
+        int minutes = (int) (totalDuration / 60);
+        int seconds = (int) (totalDuration % 60);
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     public Long saveCourse(Jwt jwt, Map<String, String> thumbnailPath, String markdownPath, UploadRequestDto uploadRequestDto) {
 
         // user 가져오기
         String username = jwt.getClaim("cognito:username").toString();
+        log.info("username={}", username);
         User user = userRepository.findById(username).get();
 
         // Course 저장하기

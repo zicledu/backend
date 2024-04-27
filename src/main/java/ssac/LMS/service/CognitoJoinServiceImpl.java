@@ -75,9 +75,14 @@ public class CognitoJoinServiceImpl implements AuthService{
                 .build();
         try {
 
-            cognitoClient.signUp(signUpRequest);
+
+            SignUpResponse signUpResponse = cognitoClient.signUp(signUpRequest);
+            String id = signUpResponse.userSub();
+
+            log.info("saveUserId={}", id);
 
             User user = new User();
+            user.setUserId(id);
             user.setUserName(joinRequestDto.getUserName());
             user.setEmail(joinRequestDto.getEmail());
             user.setTelephone(joinRequestDto.getTelephone());

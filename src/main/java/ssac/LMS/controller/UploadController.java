@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jcodec.api.JCodecException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +32,7 @@ public class UploadController {
     private final UploadService uploadService;
 
     @PostMapping
-    public ResponseEntity<?> upload(UploadRequestDto uploadRequestDto, @AuthenticationPrincipal Jwt jwt) throws IOException {
+    public ResponseEntity<?> upload(UploadRequestDto uploadRequestDto, @AuthenticationPrincipal Jwt jwt) throws IOException, JCodecException {
         log.info("jwtUserEmail={}", jwt.getClaim("email").toString());
 
         String email = jwt.getClaim("email").toString();
