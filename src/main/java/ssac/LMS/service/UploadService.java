@@ -186,6 +186,7 @@ public class UploadService {
         double totalDuration = frameGrab.getVideoTrack().getMeta().getTotalDuration();
         int minutes = (int) (totalDuration / 60);
         int seconds = (int) (totalDuration % 60);
+        file1.delete();
         return String.format("%02d:%02d", minutes, seconds);
     }
 
