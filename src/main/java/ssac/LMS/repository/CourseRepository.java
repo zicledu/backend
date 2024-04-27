@@ -1,5 +1,7 @@
 package ssac.LMS.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +19,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "WHERE LOWER(c.title) LIKE LOWER(concat('%', :keyword, '%')) " +
             "   OR LOWER(c.tags) LIKE LOWER(concat('%', :keyword, '%')) " +
             "   OR LOWER(u.userName) LIKE LOWER(concat('%', :keyword, '%'))")
-    List<Course> findByKeyword(@Param("keyword") String keyword);
+    Page<Course> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     List<Course> findAllByUser(User user);
 

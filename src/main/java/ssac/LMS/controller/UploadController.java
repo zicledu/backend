@@ -37,12 +37,13 @@ public class UploadController {
         String email = jwt.getClaim("email").toString();
 
         Map<String, String> thumbnailPath = uploadService.uploadThumbnail(uploadRequestDto.getThumbnail(), email);
+        System.out.println("thumbnailPath = " + thumbnailPath);
         String markdownPath = uploadService.uploadMarkdown(uploadRequestDto.getMarkdown(), email);
-
+        System.out.println("markdownPath = " + markdownPath);
         Long courseId = uploadService.saveCourse(jwt, thumbnailPath, markdownPath, uploadRequestDto);
-
+        System.out.println("courseId = " + courseId);
         uploadService.uploadVideo(uploadRequestDto.getLecture(), email, courseId);
-
+        System.out.println("courseId = " + courseId);
         return ResponseEntity.status(HttpServletResponse.SC_CREATED).body(new UploadResponseDto(courseId));
     }
 

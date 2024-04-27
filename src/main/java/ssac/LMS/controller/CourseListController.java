@@ -4,6 +4,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -81,12 +84,17 @@ public class CourseListController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> getSearchCourse(@RequestParam("keyword") String keyword) {
-        List<Course> searchCourse = courseListService.getSearchCourse(keyword);
+    public ResponseEntity<?> getSearchCourse(@RequestParam("keyword") String keyword,
+                                             @PageableDefault(page = 0, size = 1) Pageable pageable) {
+        Page<Course> searchCourse = courseListService.getSearchCourse(keyword, pageable);
+
+        int nowPage = searchCourse.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 5, searchCourse.getTotalPages());
 
         // 각 강의 정보를 CourseSearchInfo로 변환하여 리스트에 추가
-        List<CourseSearchResponseDto> responseDtoList = searchCourse.stream()
-                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getDescription(), course.getCourseId(), course.getThumbnailPath450(),  course.getTags(), course.getUser().getUserName()))
+        List<CourseSearchResponseDto> responseDtoList = searchCourse.getContent().stream()
+                .map(course -> new CourseSearchResponseDto(course.getTitle(), course.getDescription(), course.getCourseId(), course.getThumbnailPath(),  course.getTags(), course.getUser().getUserName()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(new Result(responseDtoList.size(), responseDtoList));

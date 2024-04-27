@@ -3,6 +3,7 @@ package ssac.LMS.service;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -48,13 +49,12 @@ public class CourseListService {
         return EnrollmentByUser;
     }
 
-    // 강좌 ID로 강좌 정보를 검색합니다.
+    public Page<Course> getSearchCourse(String keyword, Pageable pageable) {
+//        Page<Course> searchResult = courseRepository.findByKeyword("%" + keyword + "%", pageable);
+//        log.info("searchResult={}", searchResult);
+//        return searchResult;
+        return courseRepository.findByKeyword("%" + keyword + "%", pageable);
 
-
-    public List<Course> getSearchCourse(String keyword) {
-        List<Course> searchResult = courseRepository.findByKeyword("%" + keyword + "%");
-        log.info("searchResult={}", searchResult);
-        return searchResult;
     }
 
     public  List<Course> getAllCourses() {
