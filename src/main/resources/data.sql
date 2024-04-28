@@ -35,13 +35,13 @@ VALUES
 -- lecture 테이블에 테스트 데이터 삽입
 INSERT INTO lectures (lecture_id, course_id, title, duration_minutes, lecture_order, video_path_720, video_path_1080, video_path_original)
 VALUES
-    (100, 100, 'Java Programming Course', '60:00', 1, '/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (200, 100, 'Variables and Data Types', '45:00', 2, '/videos/variables_720p.mp4', '/videos/variables_1080p.mp4', '/videos/variables_original.mp4'),
-    (300, 100, 'Structures', '50:00', 3, '/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (400, 200, 'Python Programming Course', '60:00', 1,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (500, 200, 'Data Science Course', '60:00', 2,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (600, 300, 'React.js Course', '60:00', 1,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (700, 300, 'Vue.js Course', '60:00', 2,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (800, 400, 'Django Course','60:00', 1,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (900, 400, 'Spring Course','60:00', 2,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4'),
-    (1000, 400, 'Spring Boot Course', '60:00', 3,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', '/videos/control_original.mp4');
+    (100, 100, 'Java Programming Course', '60:00', 1, '/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/0564d3f0-1333-4a74-860d-fbe737cbd861.mp4'),
+    (200, 100, 'Variables and Data Types', '45:00', 2, '/videos/variables_720p.mp4', '/videos/variables_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/078740fe-c13b-4141-9e34-42e13ae5ad53.mp4'),
+    (300, 100, 'Structures', '50:00', 3, '/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/0a1733e3-d86f-4a60-a8af-3064af27bf14.mp4'),
+    (400, 200, 'Python Programming Course', '60:00', 1,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/10995928-c1ff-4508-b939-3f4e18ccbbed.mp4'),
+    (500, 200, 'Data Science Course', '60:00', 2,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/1a4a7c92-254b-4609-b4e5-ec990ad49c84.mp4'),
+    (600, 300, 'React.js Course', '60:00', 1,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/1bc00b5b-e94c-408c-ba92-ece0b44be703.mp4'),
+    (700, 300, 'Vue.js Course', '60:00', 2,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/711acaaf-bced-4ad7-8ee5-48d5e9683e04.mp4'),
+    (800, 400, 'Django Course','60:00', 1,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/874ca1dc-3168-453b-9637-28e7aea52571.mp4'),
+    (900, 400, 'Spring Course','60:00', 2,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/95e7c4b8-cd7c-4100-acec-de71ae977a98.mp4'),
+    (1000, 400, 'Spring Boot Course', '60:00', 3,'/videos/control_720p.mp4', '/videos/control_1080p.mp4', 'https://lms-inputvod-968574.s3.ap-northeast-2.amazonaws.com/sjhty123%40naver.com/f4c7e9c1-e002-4277-b2a1-bd18f87b2b71.mp4');
