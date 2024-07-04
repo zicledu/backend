@@ -17,6 +17,7 @@ import org.jcodec.common.io.NIOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ssac.LMS.domain.Course;
 import ssac.LMS.domain.Lecture;
@@ -129,6 +130,7 @@ public class UploadService {
         return urlMap;
     }
 
+    @Transactional
     public void uploadVideo(List<Map<String, Object>> videos, String email, Long courseId) throws IOException, JCodecException {
 
         AmazonS3 credentials = getCredentials();
@@ -190,6 +192,7 @@ public class UploadService {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
+    @Transactional
     public Long saveCourse(Jwt jwt, Map<String, String> thumbnailPath, String markdownPath, UploadRequestDto uploadRequestDto) {
 
         // user 가져오기

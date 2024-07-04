@@ -1,6 +1,5 @@
 package ssac.LMS.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -26,7 +25,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,7 +41,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GlobalSignOutRequest;
 import ssac.LMS.exception.CognitoAuthenticationEntryPoint;
-import ssac.LMS.service.CognitoJoinServiceImpl;
+import ssac.LMS.service.CognitoAuthServiceImpl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -66,7 +64,7 @@ public class SecurityConfig {
     @Value("${simple.jwe-key-value}")
     RSAPrivateKey key;
 
-    private final CognitoJoinServiceImpl cognitoJoinService;
+    private final CognitoAuthServiceImpl cognitoJoinService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {

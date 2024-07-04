@@ -50,9 +50,7 @@ public class CourseListService {
     }
 
     public Page<Course> getSearchCourse(String keyword, Pageable pageable) {
-//        Page<Course> searchResult = courseRepository.findByKeyword("%" + keyword + "%", pageable);
-//        log.info("searchResult={}", searchResult);
-//        return searchResult;
+
         return courseRepository.findByKeyword("%" + keyword + "%", pageable);
 
     }
