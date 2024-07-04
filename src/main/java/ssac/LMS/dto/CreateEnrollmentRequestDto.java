@@ -6,10 +6,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-
 @NoArgsConstructor
-public class LoginRequestDto {
-
-    private String email;
-    private String password;
+public class CreateEnrollmentRequestDto {
+    private String userId;
+    private Long courseId;
 }

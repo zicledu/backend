@@ -5,11 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-
 @NoArgsConstructor
-public class LoginRequestDto {
+@AllArgsConstructor
+public class MarkdownResponseDto {
 
-    private String email;
-    private String password;
+    private String pathUrl;
 }

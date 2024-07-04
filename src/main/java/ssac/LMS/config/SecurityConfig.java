@@ -1,6 +1,5 @@
 package ssac.LMS.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -26,6 +25,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,7 +40,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GlobalSignOutRequest;
-import ssac.LMS.service.CognitoJoinServiceImpl;
+import ssac.LMS.exception.CognitoAuthenticationEntryPoint;
+import ssac.LMS.service.CognitoAuthServiceImpl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -52,7 +53,7 @@ import java.util.*;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig  {
+public class SecurityConfig {
 
     private final JWSAlgorithm jwsAlgorithm = JWSAlgorithm.RS256;
     private final JWEAlgorithm jweAlgorithm = JWEAlgorithm.RSA_OAEP_256;
@@ -63,7 +64,7 @@ public class SecurityConfig  {
     @Value("${simple.jwe-key-value}")
     RSAPrivateKey key;
 
-    private final CognitoJoinServiceImpl cognitoJoinService;
+    private final CognitoAuthServiceImpl cognitoJoinService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -82,9 +83,12 @@ public class SecurityConfig  {
         http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/join", "/login","/course/new", "/course/best", "/refresh", "/class", "/class/**", "/class/**/**").permitAll()
-                .requestMatchers("/main").hasAuthority("ROLE_STUDENT")
-                .anyRequest().authenticated());
+
+                        .requestMatchers("/", "/join", "/login", "/course/new", "/course/best", "/refresh", "/course/**", "/class/**", "/upload/**").permitAll()
+                        .requestMatchers("/upload/**").hasAuthority("ROLE_INSTRUCTOR")
+                        .requestMatchers("/main").hasAuthority("ROLE_STUDENT")
+                        .anyRequest().authenticated())
+                .exceptionHandling((exceptionConfig) -> exceptionConfig.authenticationEntryPoint(new CognitoAuthenticationEntryPoint()));
         http.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()
@@ -102,6 +106,11 @@ public class SecurityConfig  {
                                         .accessToken(accessToken)
                                         .build();
                                 cognitoClient.globalSignOut(globalSignOutRequest);
+                                response.setStatus(HttpServletResponse.SC_OK); // 응답의 상태 코드를 설정 (예: 200 OK)
+                                response.setContentType("text/plain"); // 응답의 컨텐츠 타입 설정
+                                response.setCharacterEncoding("UTF-8"); // 응답의 문자 인코딩 설정
+                                response.getWriter().write("Custom logout message"); // 응답의 본문을 작성하여 클라이언트에게 전달
+                                response.getWriter().flush(); // 작성한 응답을 클라이언트에게 전송
 
                             } else {
                                 // 인증되지 않은 사용자의 경우 처리

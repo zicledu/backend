@@ -6,10 +6,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-
 @NoArgsConstructor
-public class LoginRequestDto {
+public class GetInfoResponseDto {
 
-    private String email;
-    private String password;
+    private String markdown;
 }

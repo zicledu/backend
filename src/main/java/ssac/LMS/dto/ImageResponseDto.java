@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+public class ImageResponseDto {
 
-@NoArgsConstructor
-public class LoginRequestDto {
-
-    private String email;
-    private String password;
+    private String imageUrl;
 }

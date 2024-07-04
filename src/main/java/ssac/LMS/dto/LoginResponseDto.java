@@ -13,6 +13,7 @@ public class LoginResponseDto {
     private String userId;
     private String userName;
     private String email;
+    private String role;
     private LocalDateTime expiredDate;
     private TokenDto tokenDto;
 

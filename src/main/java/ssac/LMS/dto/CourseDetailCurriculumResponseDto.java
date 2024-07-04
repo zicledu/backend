@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-
 @NoArgsConstructor
-public class LoginRequestDto {
-
-    private String email;
-    private String password;
+public class CourseDetailCurriculumResponseDto {
+    private Long id;
+    private String title;
+    private String runTime;
+    private int order;
 }
